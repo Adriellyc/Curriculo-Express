@@ -24,4 +24,23 @@ router.post("/", async (req, res) => {
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ erro
+    res.status(500).json({ error: "Erro ao criar skill" });
+  }
+});
+
+// Associa uma skill a uma pessoa com nível
+router.post("/assign", async (req, res) => {
+  const { person_id, skill_id, level } = req.body;
+  try {
+    await db.query(
+      "INSERT INTO people_skills (person_id, skill_id, level) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+      [person_id, skill_id, level]
+    );
+    res.status(201).json({ message: "Skill associada à pessoa" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao associar skill" });
+  }
+});
+
+module.exports = router;
