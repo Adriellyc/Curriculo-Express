@@ -43,28 +43,26 @@ router.post("/", async (req, res) => {
 // PUT atualizar experiência
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+
+  if (!req.body) {
+    return res.status(400).json({ error: "O corpo da requisição está vazio" });
+  }
+
   const { people_id, cargo, empresa, data_inicio, data_fim, descricao } = req.body;
+
+  if (!people_id) {
+    return res.status(400).json({ error: "people_id é obrigatório" });
+  }
+
   try {
     const result = await db.query(
-      "UPDATE experiencias SET people_id=$1,cargo=$2,empresa=$3,data_inicio=$4,data_fim=$5,descricao=$6 WHERE id=$7 RETURNING *",
+      "UPDATE experiencias SET people_id=$1, cargo=$2, empresa=$3, data_inicio=$4, data_fim=$5, descricao=$6 WHERE id=$7 RETURNING *",
       [people_id, cargo, empresa, data_inicio, data_fim, descricao, id]
     );
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erro ao atualizar experiência" });
-  }
-});
-
-// DELETE experiência
-router.delete("/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    await db.query("DELETE FROM experiencias WHERE id=$1", [id]);
-    res.status(204).send();
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro ao deletar experiência" });
   }
 });
 
